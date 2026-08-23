@@ -1,0 +1,551 @@
+import type {
+  CalendarEvent,
+  Goal,
+  Habit,
+  Note,
+  PlanBlock,
+  Task,
+  Transaction,
+  UserProfile,
+} from "@/lib/types";
+
+/**
+ * Deterministic sample data. Dates are derived from the current day so the
+ * product always demos as "today", while ids and ordering stay stable.
+ */
+const DAY = 24 * 60 * 60 * 1000;
+
+function today(): Date {
+  const now = new Date();
+  return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+}
+
+export function isoDate(offsetDays = 0): string {
+  const d = new Date(today().getTime() + offsetDays * DAY);
+  return d.toISOString().slice(0, 10);
+}
+
+export function isoAt(offsetDays: number, hours: number, minutes = 0): string {
+  const d = new Date(today().getTime() + offsetDays * DAY);
+  d.setHours(hours, minutes, 0, 0);
+  return d.toISOString();
+}
+
+export const user: UserProfile = {
+  name: "Kamlesh Choudhary",
+  email: "kamlesh@lifeos.ai",
+  initials: "KC",
+  plan: "Pro",
+  timezone: "Asia/Kolkata",
+  workingHours: { start: "09:00", end: "18:00" },
+};
+
+export const tasks: Task[] = [
+  {
+    id: "task-1",
+    title: "Ship the Q3 investor update",
+    notes: "Pull ARR + retention charts from Analytics before writing.",
+    status: "in_progress",
+    priority: "high",
+    area: "work",
+    dueDate: isoDate(0),
+    estimateMinutes: 90,
+    goalId: "goal-1",
+    createdAt: isoDate(-3),
+  },
+  {
+    id: "task-2",
+    title: "Review onboarding funnel drop-off",
+    status: "todo",
+    priority: "high",
+    area: "work",
+    dueDate: isoDate(0),
+    estimateMinutes: 45,
+    goalId: "goal-1",
+    createdAt: isoDate(-2),
+    aiSuggested: true,
+  },
+  {
+    id: "task-3",
+    title: "Strength session — lower body",
+    status: "todo",
+    priority: "medium",
+    area: "health",
+    dueDate: isoDate(0),
+    estimateMinutes: 50,
+    goalId: "goal-2",
+    createdAt: isoDate(-1),
+  },
+  {
+    id: "task-4",
+    title: "Rebalance index portfolio",
+    notes: "Target 70/30 equity to debt.",
+    status: "todo",
+    priority: "medium",
+    area: "finance",
+    dueDate: isoDate(1),
+    estimateMinutes: 30,
+    goalId: "goal-3",
+    createdAt: isoDate(-6),
+  },
+  {
+    id: "task-5",
+    title: "Finish 'Designing Data-Intensive Applications' ch. 7",
+    status: "todo",
+    priority: "low",
+    area: "learning",
+    dueDate: isoDate(2),
+    estimateMinutes: 60,
+    goalId: "goal-4",
+    createdAt: isoDate(-8),
+  },
+  {
+    id: "task-6",
+    title: "Call Mom",
+    status: "todo",
+    priority: "medium",
+    area: "relationships",
+    dueDate: isoDate(0),
+    estimateMinutes: 20,
+    createdAt: isoDate(-1),
+    aiSuggested: true,
+  },
+  {
+    id: "task-7",
+    title: "Draft hiring plan for design",
+    status: "todo",
+    priority: "high",
+    area: "work",
+    dueDate: isoDate(3),
+    estimateMinutes: 75,
+    goalId: "goal-1",
+    createdAt: isoDate(-4),
+  },
+  {
+    id: "task-8",
+    title: "Meal prep for the week",
+    status: "done",
+    priority: "low",
+    area: "health",
+    dueDate: isoDate(-1),
+    estimateMinutes: 60,
+    createdAt: isoDate(-7),
+  },
+  {
+    id: "task-9",
+    title: "Cancel unused subscriptions",
+    status: "done",
+    priority: "low",
+    area: "finance",
+    dueDate: isoDate(-2),
+    estimateMinutes: 15,
+    goalId: "goal-3",
+    createdAt: isoDate(-9),
+  },
+  {
+    id: "task-10",
+    title: "Write launch announcement thread",
+    status: "todo",
+    priority: "medium",
+    area: "work",
+    dueDate: isoDate(4),
+    estimateMinutes: 40,
+    createdAt: isoDate(-1),
+  },
+  {
+    id: "task-11",
+    title: "Book flights for the offsite",
+    status: "in_progress",
+    priority: "high",
+    area: "personal",
+    dueDate: isoDate(1),
+    estimateMinutes: 25,
+    createdAt: isoDate(-2),
+  },
+  {
+    id: "task-12",
+    title: "Weekly review + next week's priorities",
+    status: "todo",
+    priority: "medium",
+    area: "personal",
+    dueDate: isoDate(5),
+    estimateMinutes: 45,
+    createdAt: isoDate(-1),
+    aiSuggested: true,
+  },
+];
+
+export const events: CalendarEvent[] = [
+  {
+    id: "evt-1",
+    title: "Deep work — investor update",
+    start: isoAt(0, 9, 30),
+    end: isoAt(0, 11, 0),
+    area: "work",
+    kind: "focus",
+  },
+  {
+    id: "evt-2",
+    title: "Product standup",
+    start: isoAt(0, 11, 15),
+    end: isoAt(0, 11, 45),
+    area: "work",
+    kind: "meeting",
+    attendees: ["Ana", "Ravi", "Mei"],
+    location: "Google Meet",
+  },
+  {
+    id: "evt-3",
+    title: "Lunch + walk",
+    start: isoAt(0, 13, 0),
+    end: isoAt(0, 14, 0),
+    area: "health",
+    kind: "personal",
+  },
+  {
+    id: "evt-4",
+    title: "Design review",
+    start: isoAt(0, 15, 0),
+    end: isoAt(0, 16, 0),
+    area: "work",
+    kind: "meeting",
+    attendees: ["Jo", "Priya"],
+    location: "Studio",
+  },
+  {
+    id: "evt-5",
+    title: "Gym — lower body",
+    start: isoAt(0, 18, 30),
+    end: isoAt(0, 19, 30),
+    area: "health",
+    kind: "habit",
+  },
+  {
+    id: "evt-6",
+    title: "1:1 with Ravi",
+    start: isoAt(1, 10, 0),
+    end: isoAt(1, 10, 30),
+    area: "work",
+    kind: "meeting",
+    attendees: ["Ravi"],
+  },
+  {
+    id: "evt-7",
+    title: "Finance review",
+    start: isoAt(1, 16, 0),
+    end: isoAt(1, 17, 0),
+    area: "finance",
+    kind: "focus",
+  },
+  {
+    id: "evt-8",
+    title: "Hiring panel",
+    start: isoAt(2, 14, 0),
+    end: isoAt(2, 15, 30),
+    area: "work",
+    kind: "meeting",
+    attendees: ["Ana", "Sam"],
+  },
+  {
+    id: "evt-9",
+    title: "Reading block",
+    start: isoAt(2, 20, 0),
+    end: isoAt(2, 21, 0),
+    area: "learning",
+    kind: "focus",
+  },
+  {
+    id: "evt-10",
+    title: "Dinner with Aditi",
+    start: isoAt(3, 19, 30),
+    end: isoAt(3, 21, 30),
+    area: "relationships",
+    kind: "personal",
+    location: "Toit",
+  },
+  {
+    id: "evt-11",
+    title: "Long run",
+    start: isoAt(4, 7, 0),
+    end: isoAt(4, 8, 15),
+    area: "health",
+    kind: "habit",
+  },
+  {
+    id: "evt-12",
+    title: "Weekly review",
+    start: isoAt(5, 17, 0),
+    end: isoAt(5, 18, 0),
+    area: "personal",
+    kind: "focus",
+  },
+  {
+    id: "evt-13",
+    title: "Roadmap workshop",
+    start: isoAt(-1, 11, 0),
+    end: isoAt(-1, 12, 30),
+    area: "work",
+    kind: "meeting",
+    attendees: ["Ana", "Mei", "Jo"],
+  },
+];
+
+export const goals: Goal[] = [
+  {
+    id: "goal-1",
+    title: "Take LifeOS AI to $1M ARR",
+    description:
+      "Grow from $420k to $1M ARR by shipping the AI planner and closing 12 team accounts.",
+    area: "work",
+    targetDate: isoDate(120),
+    progress: 42,
+    metric: { label: "ARR", current: 420, target: 1000, unit: "k" },
+    milestones: [
+      { id: "m-1", title: "Launch AI Planner v2", done: true },
+      { id: "m-2", title: "Hit 8% trial-to-paid", done: true },
+      { id: "m-3", title: "Close 12 team accounts", done: false },
+      { id: "m-4", title: "Publish 20 SEO guides", done: false },
+    ],
+  },
+  {
+    id: "goal-2",
+    title: "Run a sub-50 minute 10K",
+    description: "Three runs and two strength sessions per week, progressive load.",
+    area: "health",
+    targetDate: isoDate(75),
+    progress: 64,
+    metric: { label: "Best 10K", current: 53, target: 50, unit: "min" },
+    milestones: [
+      { id: "m-5", title: "Base building block", done: true },
+      { id: "m-6", title: "Sub-55 time trial", done: true },
+      { id: "m-7", title: "Tempo block", done: false },
+    ],
+  },
+  {
+    id: "goal-3",
+    title: "Build a 12-month runway fund",
+    description: "Automate savings and cut recurring spend by 15%.",
+    area: "finance",
+    targetDate: isoDate(200),
+    progress: 58,
+    metric: { label: "Saved", current: 7.1, target: 12, unit: "mo" },
+    milestones: [
+      { id: "m-8", title: "Automate 30% transfers", done: true },
+      { id: "m-9", title: "Cut subscriptions", done: true },
+      { id: "m-10", title: "Rebalance portfolio", done: false },
+    ],
+  },
+  {
+    id: "goal-4",
+    title: "Become fluent in systems design",
+    description: "One deep chapter and one design writeup every week.",
+    area: "learning",
+    targetDate: isoDate(90),
+    progress: 35,
+    metric: { label: "Chapters", current: 7, target: 20, unit: "" },
+    milestones: [
+      { id: "m-11", title: "Finish DDIA part I", done: true },
+      { id: "m-12", title: "Write 5 design docs", done: false },
+    ],
+  },
+];
+
+function historyFrom(pattern: number[]): boolean[] {
+  return Array.from({ length: 28 }, (_, i) => pattern[i % pattern.length] === 1);
+}
+
+export const habits: Habit[] = [
+  {
+    id: "habit-1",
+    name: "Morning deep work",
+    cadence: "weekdays",
+    area: "work",
+    streak: 14,
+    bestStreak: 31,
+    history: historyFrom([1, 1, 1, 1, 1, 0, 0]),
+    timeOfDay: "morning",
+    completedToday: true,
+  },
+  {
+    id: "habit-2",
+    name: "Move 45 minutes",
+    cadence: "daily",
+    area: "health",
+    streak: 6,
+    bestStreak: 22,
+    history: historyFrom([1, 1, 0, 1, 1, 1, 0]),
+    timeOfDay: "evening",
+    completedToday: false,
+  },
+  {
+    id: "habit-3",
+    name: "Read 20 pages",
+    cadence: "daily",
+    area: "learning",
+    streak: 9,
+    bestStreak: 40,
+    history: historyFrom([1, 1, 1, 0, 1, 1, 1]),
+    timeOfDay: "evening",
+    completedToday: false,
+  },
+  {
+    id: "habit-4",
+    name: "No-spend day",
+    cadence: "3x_week",
+    area: "finance",
+    streak: 3,
+    bestStreak: 11,
+    history: historyFrom([1, 0, 1, 0, 1, 0, 0]),
+    timeOfDay: "morning",
+    completedToday: true,
+  },
+  {
+    id: "habit-5",
+    name: "Evening shutdown ritual",
+    cadence: "daily",
+    area: "personal",
+    streak: 21,
+    bestStreak: 21,
+    history: historyFrom([1, 1, 1, 1, 1, 1, 0]),
+    timeOfDay: "evening",
+    completedToday: false,
+  },
+];
+
+export const notes: Note[] = [
+  {
+    id: "note-1",
+    title: "Investor update — raw notes",
+    content:
+      "ARR at $420k, up 18% MoM. Retention is the story: 94% logo retention on Pro.\n\nRisks: onboarding drop-off at the connect-calendar step (37%). Fix before we push paid acquisition.\n\nAsk: intros to 3 seed-stage productivity funds.",
+    tags: ["work", "fundraising"],
+    updatedAt: isoAt(0, 8, 20),
+    pinned: true,
+    aiSummary:
+      "Strong growth and retention; onboarding drop-off is the blocker. Two tasks extracted.",
+  },
+  {
+    id: "note-2",
+    title: "Weekly review template",
+    content:
+      "1. What moved the needle?\n2. What did I avoid, and why?\n3. What gets deleted next week?\n4. One system to improve.",
+    tags: ["personal", "system"],
+    updatedAt: isoAt(-1, 18, 5),
+    pinned: true,
+  },
+  {
+    id: "note-3",
+    title: "Training block plan",
+    content:
+      "Weeks 1-3 base, week 4 deload. Two strength sessions, one tempo, one long run. Keep easy runs genuinely easy — zone 2 or it does not count.",
+    tags: ["health"],
+    updatedAt: isoAt(-2, 7, 40),
+    pinned: false,
+  },
+  {
+    id: "note-4",
+    title: "Design review feedback",
+    content:
+      "Planner timeline needs stronger hierarchy — the current block colors compete. Try muted fills with a single accent for the AI-suggested block.",
+    tags: ["work", "design"],
+    updatedAt: isoAt(-3, 16, 10),
+    pinned: false,
+    aiSummary: "Reduce color competition in planner timeline; accent only AI blocks.",
+  },
+  {
+    id: "note-5",
+    title: "Books to read next",
+    content: "- The Making of a Manager\n- Thinking in Systems\n- Elastic Leadership",
+    tags: ["learning"],
+    updatedAt: isoAt(-5, 21, 30),
+    pinned: false,
+  },
+];
+
+export const planBlocks: PlanBlock[] = [
+  {
+    id: "plan-1",
+    start: "07:00",
+    end: "07:45",
+    title: "Morning reset + review plan",
+    type: "habit",
+    area: "personal",
+    rationale: "You complete 84% of days that start with a review.",
+  },
+  {
+    id: "plan-2",
+    start: "09:30",
+    end: "11:00",
+    title: "Deep work — Q3 investor update",
+    type: "focus",
+    area: "work",
+    rationale: "Your highest-focus window, and this is due today.",
+    taskId: "task-1",
+  },
+  {
+    id: "plan-3",
+    start: "11:15",
+    end: "11:45",
+    title: "Product standup",
+    type: "meeting",
+    area: "work",
+    rationale: "Fixed calendar commitment.",
+  },
+  {
+    id: "plan-4",
+    start: "12:00",
+    end: "12:45",
+    title: "Onboarding funnel drop-off review",
+    type: "focus",
+    area: "work",
+    rationale: "Blocks the investor update — sequenced before lunch.",
+    taskId: "task-2",
+  },
+  {
+    id: "plan-5",
+    start: "13:00",
+    end: "14:00",
+    title: "Lunch + walk",
+    type: "break",
+    area: "health",
+    rationale: "Protects afternoon energy; you skip this on low-output days.",
+  },
+  {
+    id: "plan-6",
+    start: "15:00",
+    end: "16:00",
+    title: "Design review",
+    type: "meeting",
+    area: "work",
+    rationale: "Fixed calendar commitment.",
+  },
+  {
+    id: "plan-7",
+    start: "16:15",
+    end: "16:35",
+    title: "Call Mom",
+    type: "admin",
+    area: "relationships",
+    rationale: "Rolled over 3 days — scheduled in a low-cost gap.",
+    taskId: "task-6",
+  },
+  {
+    id: "plan-8",
+    start: "18:30",
+    end: "19:30",
+    title: "Strength session — lower body",
+    type: "habit",
+    area: "health",
+    rationale: "Keeps your 10K goal on pace this week.",
+    taskId: "task-3",
+  },
+];
+
+export const transactions: Transaction[] = [
+  { id: "tx-1", merchant: "Rent", amount: 1850, category: "housing", date: isoDate(-12) },
+  { id: "tx-2", merchant: "Whole Foods", amount: 142.4, category: "food", date: isoDate(-4) },
+  { id: "tx-3", merchant: "Uber", amount: 28.5, category: "transport", date: isoDate(-3) },
+  { id: "tx-4", merchant: "Equinox", amount: 210, category: "health", date: isoDate(-9) },
+  { id: "tx-5", merchant: "Index fund transfer", amount: 1200, category: "savings", date: isoDate(-2) },
+  { id: "tx-6", merchant: "Cinema", amount: 34, category: "fun", date: isoDate(-1) },
+];
